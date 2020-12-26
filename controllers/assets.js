@@ -32,12 +32,11 @@ const getAllAssets = (req, res, next) => {
 }
 
 const getAllRequest = (req, res, next) => {
-    const query =  `SELECT request_info.id as req_id, request_info.employee as employee, request_info.quantity as req_quantity,
+    const query =  `SELECT request_info.id as req_id, request_info.employee as employee, request_info.quantity as req_quantity, request_info.status as status,
                         asset_info.id as asset_id, asset_info.title as title, asset_info.category as category, asset_info.assigned as assigned, asset_info.pending as pending,
                         user_info.name as manager
                     FROM request_info, asset_info, user_info 
-                    WHERE   status='pending' and 
-                            request_info.manager_id = user_info.id and 
+                    WHERE   request_info.manager_id = user_info.id and 
                             request_info.asset_id = asset_info.id`;
     db.query(query).then(dbRes => {
         res.json({
@@ -49,23 +48,6 @@ const getAllRequest = (req, res, next) => {
     });
 }
 
-const getAssignedAsset = (req, res, next) => {
-    const query =  `SELECT  request_info.employee as employee, request_info.quantity as req_quantity,
-                        asset_info.title as title, asset_info.category as category,
-                        user_info.name as manager
-                    FROM request_info, asset_info, user_info 
-                    WHERE   status='assigned' and 
-                            request_info.manager_id = user_info.id and 
-                            request_info.asset_id = asset_info.id`;
-    db.query(query).then(dbRes => {
-        res.json({
-            error: false,
-            assets: dbRes.rows
-        });
-    }).catch(dbErr => {
-        next(dbErr);
-    });
-}
 
 const getRequestStatus = (req, res, next) => {
     const query = `SELECT asset_info.title as title, asset_info.category as category,
@@ -83,18 +65,6 @@ const getRequestStatus = (req, res, next) => {
     });
 }
 
-const getAssetByID = (req, res, next) => {
-    const query = `SELECT * FROM asset_info WHERE id='${req.body.id}'`;
-    db.query(query).then(dbRes => {
-        res.json({
-            error: false,
-            assets: dbRes.rows,
-            message: "data found"
-        });
-    }).catch(dbErr => {
-        next(dbErr);
-    });
-}
 
 const addAsset = (req, res, next) => {
     const query = `
@@ -265,9 +235,7 @@ module.exports = {
     checkAssetId,
     getAllAssets,
     getAllRequest,
-    getAssignedAsset,
     getRequestStatus,
-    getAssetByID,
     addAsset,
     updateAsset,
     requestAsset,
