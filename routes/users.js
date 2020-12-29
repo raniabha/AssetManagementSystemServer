@@ -3,10 +3,11 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
-
 const db = require('../util/database');
 const config = require('../config/config.json');
 
+
+//  use in signup Module
 const checkEmailAvailability = (req, res, next) => {
     const query = `
         SELECT * FROM user_info
@@ -25,7 +26,7 @@ const checkEmailAvailability = (req, res, next) => {
         next(dbErr);
     });
 }
-
+//  use in signup Module
 router.post('/signup', checkEmailAvailability, (req, res, next) => {
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(req.body.password, salt);
@@ -46,7 +47,7 @@ router.post('/signup', checkEmailAvailability, (req, res, next) => {
         next(dbErr);
     });
 });
-
+//  use in signIn Module
 router.post('/login', (req, res, next) => {
     const query = `
         SELECT * FROM user_info
@@ -85,6 +86,7 @@ router.post('/login', (req, res, next) => {
         next(dbErr);
     })
 });
+//  use in profile Module
 router.put('/getProfile/:email', (req, res, next) => {
     const query = `SELECT * FROM user_info WHERE email='${req.params.email}'`;
     db.query(query).then(dbRes => {
@@ -98,7 +100,7 @@ router.put('/getProfile/:email', (req, res, next) => {
         next(dbErr);
     });
 });
-
+//  use in profile Module
 router.post('/updateProfile', (req, res, next) => {
     const updateQuery = `
         UPDATE user_info
